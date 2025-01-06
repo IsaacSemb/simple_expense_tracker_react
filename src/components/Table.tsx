@@ -1,43 +1,56 @@
-function Table() {
+interface tableProps {
+  expensesList: [
+    {
+      description: string;
+      amount: number;
+      category: string;
+    }
+  ];
+  filterItems: (item:string) => void;
+}
+
+function Table({ expensesList, filterItems }: tableProps) {
   return (
     <>
       <h3 className="mt-5">Summary of Expenses</h3>
       <div className="mb-3">
-        <label htmlFor="category" className="form-label">
-        </label>
-        <select id="category" className="form-select">
-          <option value="" disabled selected>
-            choose a category
+        <label htmlFor="category" className="form-label"></label>
+        <select
+          onChange={(evt)=>(filterItems(evt.target.value))}
+          id="category"
+          className="form-select"
+          defaultValue="full"
+        >
+          <option value="full" >
+            All
           </option>
           <option value="groceries">Groceries</option>
           <option value="utilities">Utilities</option>
           <option value="entertainment">Entertainment</option>
+          <option value="bills">bills</option>
         </select>
       </div>
-
 
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Item</th>
+            <th scope="col">Description</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Categories</th>
+            <th scope="col">Manage</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
+          {expensesList.map((expense, index) => (
+            <tr key={index}>
+              <th scope="row">{index+1}</th>
+              <td>{expense.description}</td>
+              <td>{expense.amount}</td>
+              <td>{expense.category}</td>
+              <td>delete Item</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </>
