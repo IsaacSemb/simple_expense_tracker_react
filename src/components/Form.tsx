@@ -1,24 +1,14 @@
 import { useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { expenseObject } from "./interfaces/expenseObject";
 
-interface formData {
-  description: string;
-  amount: number;
-  category: string;
-}
 
 interface tableProps {
-  expensesList: [
-    {
-      description: string;
-      amount: number;
-      category: string;
-    }
-  ];
-  onSubmitPressed: (data:formData) => void;
+  expensesList: expenseObject[];
+  onSubmitPressed: (data: expenseObject) => void;
 }
 
-function Form({ expensesList, onSubmitPressed }: tableProps) {
+function Form({ onSubmitPressed }: tableProps) {
   // npm install react-hook-form
   const {
     // destructure the useForm object to get register, handleSublmit and formState
@@ -26,27 +16,31 @@ function Form({ expensesList, onSubmitPressed }: tableProps) {
     handleSubmit,
     // destructure this further to get the errors
     formState: { errors },
+    // reset the entire form
     reset,
-  } = useForm<formData>();
+  } = useForm<expenseObject>();
 
   const [categories /* setCategories */] = useState<string[]>([
     "groceries",
     "utilities",
     "entertainment",
-    "bills"
+    "bills",
   ]);
-  const [allExpenses, setAllExpenses] = useState<FieldValues[]>([]);
 
   function capitalizeFirstLetter(str: string) {
     if (!str) return ""; // Handle empty strings
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-
   return (
     <>
       <h3 className="mt-1">Add an Expense</h3>
-      <form onSubmit={handleSubmit((data) => onSubmitPressed(data))}>
+      <form
+        onSubmit={handleSubmit((data) => {
+          reset();
+          onSubmitPressed(data);
+        })}
+      >
         <div className="mb-3">
           <label htmlFor="description" className="form-label">
             Description
@@ -124,5 +118,4 @@ function Form({ expensesList, onSubmitPressed }: tableProps) {
     </>
   );
 }
-
 export default Form;
