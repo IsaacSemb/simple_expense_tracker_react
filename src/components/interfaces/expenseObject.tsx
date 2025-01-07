@@ -1,6 +1,6 @@
 // Centralized shared interface
 export interface expenseObject {
-  itemId: number;
+  itemId: string|number;
   description: string;
   amount: number;
   category: string;

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { expenseObject } from "./interfaces/expenseObject";
 
-
 interface tableProps {
   expensesList: expenseObject[];
   onSubmitPressed: (data: expenseObject) => void;

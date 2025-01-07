@@ -3,7 +3,7 @@ import { expenseObject } from "./interfaces/expenseObject";
 interface tableProps {
   expensesList: expenseObject[];
   filterItems: (item: string) => void;
-  onDelete: (itemId: number) => void;
+  onDelete: (itemId: string|number) => void;
 }
 
 function Table({ expensesList, filterItems, onDelete }: tableProps) {
@@ -38,7 +38,7 @@ function Table({ expensesList, filterItems, onDelete }: tableProps) {
         </thead>
         <tbody>
           {expensesList.map((expense, index) => (
-            <tr key={index}>
+            <tr key={expense.itemId}>
               <th scope="row">{index + 1}</th>
               <td>{expense.description}</td>
               <td>£ {expense.amount}</td>
@@ -55,13 +55,12 @@ function Table({ expensesList, filterItems, onDelete }: tableProps) {
           ))}
         </tbody>
         <tfoot>
-          {" "}
           <tr>
             <th scope="col" colSpan={2} className="text-center">
               Total
             </th>
             <th scope="col" colSpan={3} className="text-center">
-              £{" "}
+              £
               {expensesList.reduce((accumulator, expense) => {
                 return accumulator + expense.amount;
               }, 0)}
