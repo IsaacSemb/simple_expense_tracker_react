@@ -2,7 +2,7 @@ import { useState } from "react";
 import Form from "./components/Form";
 import Table from "./components/Table";
 import { expenseObject } from "./components/interfaces/expenseObject";
-import { v4 as uuid4 } from "uuid";
+
 
 function App() {
   const [allExpenses, setAllExpenses] = useState<expenseObject[]>([
@@ -59,7 +59,7 @@ function App() {
     console.log(data);
 
     // add the content to all expenses
-    setAllExpenses([...allExpenses, { ...data, itemId: uuid4() }]);
+    setAllExpenses([...allExpenses, { ...data }]);
     console.log(allExpenses);
   }
 

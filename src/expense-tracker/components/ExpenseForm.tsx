@@ -1,12 +1,32 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import singleExpenseObject from "../interfaces/singleExpenseObject";
+// import singleExpenseObject from "../interfaces/singleExpenseObject";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import categories from "../categories";
+
+const zod_schema = z.object({
+  description: z
+    .string()
+    .min(3, { message: "Desription should be atleast 3 characters long" })
+    .max(100),
+  amount: z
+    .number({ invalid_type_error: "Amount is required!" })
+    .min(0.01, { message: "lowest amount is 0.01" })
+    .max(100_000, { message: "max amount is 100,000" }),
+  category: z.enum(categories, {
+    errorMap: () => ({
+      message: "Category is required!",
+    }),
+  }),
+});
+
+type ExpenseFormData = z.infer<typeof zod_schema>;
 
 interface tableProps {
-  onSubmitPressed: (data: singleExpenseObject) => void;
+  onSubmitPressed: (data: ExpenseFormData) => void;
 }
 
-function Form({ onSubmitPressed }: tableProps) {
+function ExpenseForm({ onSubmitPressed }: tableProps) {
   // npm install react-hook-form
   const {
     // destructure the useForm object to get register, handleSublmit and formState
@@ -16,14 +36,7 @@ function Form({ onSubmitPressed }: tableProps) {
     formState: { errors },
     // reset the entire form
     reset,
-  } = useForm<singleExpenseObject>();
-
-  const [categories /* setCategories */] = useState<string[]>([
-    "groceries",
-    "utilities",
-    "entertainment",
-    "bills",
-  ]);
+  } = useForm<ExpenseFormData>({ resolver: zodResolver(zod_schema) });
 
   function capitalizeFirstLetter(str: string) {
     if (!str) return ""; // Handle empty strings
@@ -45,20 +58,13 @@ function Form({ onSubmitPressed }: tableProps) {
             Description
           </label>
           <input
-            {...register("description", {
-              required: true,
-              minLength: 3,
-            })}
+            {...register("description")}
             id="description"
             type="text"
             className="form-control"
           />
-          {/* handle errors */}
-          {errors.description?.type === "required" && (
-            <p className="text-danger">this field is required</p>
-          )}
-          {errors.description?.type === "minLength" && (
-            <p className="text-danger">name must be more than 3 characters</p>
+          {errors.description && (
+            <p className="text-danger">{errors.description.message}</p>
           )}
         </div>
         <div className="mb-3">
@@ -66,22 +72,14 @@ function Form({ onSubmitPressed }: tableProps) {
             Amount
           </label>
           <input
-            {...register("amount", {
-              required: true,
-              min: 1,
-            })}
+            {...register("amount", { valueAsNumber: true })}
             id="amount"
             type="number"
             className="form-control"
           />
           {/* handle errors */}
-          {errors.description?.type === "required" && (
-            <p className="text-danger">this field is required</p>
-          )}
-          {errors.amount?.type === "min" && (
-            <p className="text-danger">
-              amount should be atleast more than 1 pound
-            </p>
+          {errors.amount && (
+            <p className="text-danger">{errors.amount.message}</p>
           )}
         </div>
         <div className="mb-3">
@@ -89,9 +87,7 @@ function Form({ onSubmitPressed }: tableProps) {
             Category
           </label>
           <select
-            {...register("category", {
-              required: true,
-            })}
+            {...register("category")}
             id="category"
             className="form-select"
             defaultValue=""
@@ -99,15 +95,15 @@ function Form({ onSubmitPressed }: tableProps) {
             <option value="" disabled>
               choose a category
             </option>
-            {categories.map((category) => (
+            {categories.map((category: string) => (
               <option key={category} value={category}>
                 {capitalizeFirstLetter(category)}
               </option>
             ))}
           </select>
           {/* handle errors */}
-          {errors.category?.type === "required" && (
-            <p className="text-danger">this field is required</p>
+          {errors.category && (
+            <p className="text-danger">{errors.category.message}</p>
           )}
         </div>
         <button type="submit" className="btn btn-primary">
@@ -117,4 +113,4 @@ function Form({ onSubmitPressed }: tableProps) {
     </>
   );
 }
-export default Form;
+export default ExpenseForm;

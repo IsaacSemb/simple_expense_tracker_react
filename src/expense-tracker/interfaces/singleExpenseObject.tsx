@@ -1,5 +1,5 @@
 export default interface singleExpenseObject {
-  expenseId: number|string
+  expenseId: number
   description: string
   amount: number
   category: string

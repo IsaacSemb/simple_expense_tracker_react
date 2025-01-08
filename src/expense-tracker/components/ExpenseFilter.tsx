@@ -1,3 +1,5 @@
+// import categories from "../categories"
+
 
 interface ExpenseFilterProps{
     onSelectCategory: (category:string)=> void
