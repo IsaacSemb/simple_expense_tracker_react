@@ -69,6 +69,7 @@ function Form({ onSubmitPressed }: tableProps) {
             {...register("amount", {
               required: true,
               min: 1,
+              valueAsNumber:true
             })}
             id="amount"
             type="number"
