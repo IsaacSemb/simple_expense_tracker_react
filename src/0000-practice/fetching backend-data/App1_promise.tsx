@@ -12,7 +12,7 @@ function App1_promise() {
   useEffect(() => {
     setIsLoading(true);
 
-    const { request, cancel } = userService.getAllUsers();
+    const { request, cancel } = userService.getAllResourcesFromBackendDB<UserObject>();
 
     request
       .then((response) => {
@@ -36,7 +36,7 @@ function App1_promise() {
 
     setUsers(users.filter((user) => user.id !== userObject.id));
 
-    userService.deleteUser(userObject).catch((err) => {
+    userService.deleteResourceFromBackendDB(userObject.id).catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
@@ -54,7 +54,7 @@ function App1_promise() {
 
     // send to backend
     userService
-      .addUser(newUser)
+      .createResourceToAddToDB(newUser)
       .then(
         // destructure and give alias
         ({ data: savedUser }) => setUsers([savedUser, ...users])
@@ -73,7 +73,7 @@ function App1_promise() {
       users.map((user) => (user.id === userObject.id ? updatedUser : user))
     );
 
-    userService.updateUser(userObject).catch((err) => {
+    userService.updateResourceInBackendDB(userObject).catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
