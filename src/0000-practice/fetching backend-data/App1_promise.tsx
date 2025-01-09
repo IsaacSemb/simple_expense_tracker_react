@@ -1,32 +1,10 @@
-import { useEffect, useState } from "react";
-
-import { CanceledError } from "./services/api-client";
 import userService, { UserObject } from "./services/userService";
+import useUserFetching from "./hooks/useUserFetchingProcedure";
 
 function App1_promise() {
-  const [users, setUsers] = useState<UserObject[]>([]);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  // our test api
-  useEffect(() => {
-    setIsLoading(true);
-
-    const { request, cancel } = userService.getAllResourcesFromBackendDB<UserObject>();
-
-    request
-      .then((response) => {
-        setUsers(response.data);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        if (err instanceof CanceledError) return;
-        setError(err.message);
-        setIsLoading(false);
-      });
-    // cleanup
-    return () => cancel();
-  }, []);
+  const {users, setUsers, isLoading, error, setError } =  useUserFetching()
+  
 
   function deleteUser(userObject: UserObject) {
     // optimistic update 1. update UI 2. call server
