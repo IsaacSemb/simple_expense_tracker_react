@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 
-import customAxiosInstance, { CanceledError } from "./services/api-client";
+import { CanceledError } from "./services/api-client";
+import userService, { UserObject } from "./services/userService";
 
-interface UserObject {
-  id: number;
-  name: string;
-  email: string;
-}
 function App1_promise() {
   const [users, setUsers] = useState<UserObject[]>([]);
   const [error, setError] = useState("");
@@ -14,34 +10,22 @@ function App1_promise() {
 
   // our test api
   useEffect(() => {
-    const controller = new AbortController();
-
     setIsLoading(true);
 
-    customAxiosInstance
-      .get<UserObject[]>("/users", { signal: controller.signal })
+    const { request, cancel } = userService.getAllUsers();
 
+    request
       .then((response) => {
         setUsers(response.data);
         setIsLoading(false);
       })
-
-      // testing spinner
-      // .then((response) => {
-      //   setTimeout(() => {
-      //     setUsers(response.data);
-      //     setIsLoading(false);
-      //   }, 1000); // Simulates a network delay of 500ms
-      // })
-
       .catch((err) => {
         if (err instanceof CanceledError) return;
         setError(err.message);
         setIsLoading(false);
       });
-
     // cleanup
-    return () => controller.abort();
+    return () => cancel();
   }, []);
 
   function deleteUser(userObject: UserObject) {
@@ -52,7 +36,7 @@ function App1_promise() {
 
     setUsers(users.filter((user) => user.id !== userObject.id));
 
-    customAxiosInstance.delete("/users/" + userObject.id).catch((err) => {
+    userService.deleteUser(userObject).catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
@@ -69,8 +53,8 @@ function App1_promise() {
     setUsers([newUser, ...users]);
 
     // send to backend
-    customAxiosInstance
-      .post("/users", newUser)
+    userService
+      .addUser(newUser)
       .then(
         // destructure and give alias
         ({ data: savedUser }) => setUsers([savedUser, ...users])
@@ -89,12 +73,10 @@ function App1_promise() {
       users.map((user) => (user.id === userObject.id ? updatedUser : user))
     );
 
-    customAxiosInstance
-      .patch("/users/" + userObject.id, updatedUser)
-      .catch((err) => {
-        setError(err.message);
-        setUsers(originalUsers);
-      });
+    userService.updateUser(userObject).catch((err) => {
+      setError(err.message);
+      setUsers(originalUsers);
+    });
   }
 
   return (
